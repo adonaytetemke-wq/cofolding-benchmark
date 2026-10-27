@@ -8,7 +8,7 @@ Modern drug discovery is moving from "dock a molecule into a known structure" to
 | Stage | Topic | Status |
 |---|---|---|
 | 1 | AI-predicted structures vs crystal structures | Done |
-| 2 | Protein language model embeddings (COX-1 vs COX-2) | Planned |
+| 2 | Protein language model embeddings (COX-1 vs COX-2) | done |
 | 3 | Co-folding of drug and protein | Planned |
 | 4 | Benchmark: co-folding vs docking vs crystal | Planned |
 
