@@ -1,0 +1,8 @@
+Metric,Value
+Aligned positions / identity,568 / 64%
+Mean embedding distance: identical vs substituted,0.028 vs 0.101
+Position 513 (H->R) percentile,75
+Position 523 (I->V) percentile,69
+Pocket vs other distance,0.022 vs 0.055 (p=0.001)
+COX-1 sheep: ortholog vs paralog similarity,0.984 vs 0.939
+COX-2 mouse: ortholog vs paralog similarity,0.988 vs 0.939
