@@ -1,0 +1,11 @@
+Job,Method,Ligand RMSD (Å),Site distance (Å),Key residues,Side pocket (513/523),Ser530 OG (Å),Vina score
+cox2_celecoxib,Crystal,0.0,0.0,none,ALA513,,
+cox2_celecoxib,Vina top-1,0.58,0.48,none,ALA513,,-12.21
+cox2_celecoxib,Boltz,0.54,0.19,none,ALA513,,
+cox1_ibuprofen,Crystal,0.0,0.0,"ARG120, TYR355, SER530",ILE523,4.18,
+cox1_ibuprofen,Vina top-1,6.12,1.63,"ARG120, TYR355, TYR385",ILE523,4.18,-7.5
+cox1_ibuprofen,Boltz,0.27,0.13,"ARG120, TYR355",ILE523,4.1,
+cox1_aspirin,Vina top-1,,3.7,"TYR385, SER530",ILE523,3.12,-6.38
+cox1_aspirin,Boltz,,3.38,"TYR385, SER530",ILE523,2.74,
+cox2_aspirin,Vina top-1,,3.78,none,ALA513,,-6.34
+cox2_aspirin,Boltz,,4.04,none,ALA513,,
