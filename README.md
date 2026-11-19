@@ -8,10 +8,16 @@ Modern drug discovery is moving from "dock a molecule into a known structure" to
 | Stage | Topic | Status |
 |---|---|---|
 | 1 | AI-predicted structures vs crystal structures | Done |
-| 2 | Protein language model embeddings (COX-1 vs COX-2) | done |
-| 3 | Co-folding of drug and protein | done |
-| 4 | Benchmark: co-folding vs docking vs crystal | done |
+| 2 | Protein language model embeddings (COX-1 vs COX-2) | Done |
+| 3 | Co-folding of drug and protein | Done |
+| 4 | Benchmark: co-folding vs docking vs crystal | Done |
 
+
+## Repository Contents & Usage
+- **Notebooks (`notebooks/` and root `.ipynb` files):** Workflows for structure comparison, sequence analysis, co-folding, and docking benchmarks.
+- **Results (`results/`):** Benchmark tables, metrics, and structural outputs generated across Stages 1–4.
+
+  
 ## Stage 1 results
 
 AlphaFold Database models (not ESMFold) compared with crystal structures after superposition.
@@ -22,6 +28,7 @@ AlphaFold Database models (not ESMFold) compared with crystal structures after s
 | COX2 | 3LN1 | 587 | 92.3 | 0.55 | 0.55 | 1.0 | 99.0 | 0.35 | 0.82 |
 
 Both predictions matched the experiments closely. The pocket backbone was as accurate as the whole protein, while pocket side chains deviated more (about 0.8 Å), consistent with ligand-induced movement missing from apo predictions. Because AlphaFold was likely trained on these PDB entries, this measures reproduction of known structures rather than true prediction, so later stages test cases where memorization cannot help.
+
 
 ## Stage 2 results
 
@@ -38,7 +45,7 @@ A protein language model (ESM-2, 650M parameters) was used to compare COX-1 and 
 | COX-2 mouse: ortholog vs paralog similarity | 0.988 vs 0.939 |
 
 
-**Key Takeaway:** ESM-2 cleanly separates species orthologs from paralogs and identifies binding pockets as statistically distinct ($p=0.001$). However, the known selectivity positions (513 and 523) sit around the 70th–75th percentiles—indicating that sequence-alone models capture general evolutionary constraints, but require 3D structural context to fully pinpoint small-molecule binding pockets.
+**Key Takeaway:** ESM-2 cleanly separates species orthologs from paralogs and identifies binding pockets as statistically distinct ( p=0.001 ). However, the known selectivity positions (513 and 523) sit around the 70th–75th percentiles—indicating that sequence-alone models capture general evolutionary constraints, but require 3D structural context to fully pinpoint small-molecule binding pockets.
 
 
 ## Stage 3 Results: Co-folding of Drug and Protein
@@ -53,14 +60,14 @@ Using **Boltz**, small-molecule ligands and protein sequences were co-folded end
 | cox2_aspirin | 0.46 | n/a | 3.75 | none | n/a | 0.76 | 0.76 | 0.94 |
 
 ### Key Takeaways
-- **Accurate Poses for Non-Covalent Inhibitors:** Both *celecoxib in COX-2* and *ibuprofen in COX-1* achieved exceptionally low Ligand RMSDs ($<0.6\,\AA$), proving the model successfully positions them within the correct binding pockets with high confidence ($\text{pLDDT} > 0.93$).
+- **Accurate Poses for Non-Covalent Inhibitors:** Both *celecoxib in COX-2* and *ibuprofen in COX-1* achieved exceptionally low Ligand RMSDs (<0.6\,\AA), proving the model successfully positions them within the correct binding pockets with high confidence ($\text{pLDDT} > 0.93$).
 - **Aspirin Selectivity Hint:** Since aspirin acts via covalent acetylation rather than simple non-covalent docking, traditional RMSD doesn't apply. However, the model places aspirin significantly closer to the catalytic residue `SER530` in COX-1 ($2.87\,\AA$) compared to COX-2 ($3.75\,\AA$), capturing differential binding tendencies despite lacking explicit covalent training physics.
  
 ## Limitations
 Predictions are apo (no ligand or heme) and compared against single crystal snapshots. TM-score and GDT are approximate.
 
  
- ## Stage 4
+## Stage 4: Co-Folding vs. Docking Benchmark
  
  we benchmarked **AI co-folding (Boltz)** from Stage 3 head-to-head against **classical physics-based docking (AutoDock Vina)** and **experimental X-ray crystal structures** across four drug–enzyme complexes:
 
@@ -106,10 +113,10 @@ Predictions are apo (no ligand or heme) and compared against single crystal snap
 
 ## Key Findings
 
-1. **Pose Accuracy (`< 2.0 Å` Success Threshold):**
+1. **Pose Accuracy (< 2.0 Å Success Threshold):**
    * **Boltz achieved 2/2 sub-Ångström crystal recoveries** (`0.54 Å` on `cox2_celecoxib` and `0.27 Å` on `cox1_ibuprofen`) despite having no prior knowledge of the binding pocket coordinates.
    * **Vina top-1 succeeded on 1/2 reference complexes** (`0.58 Å` on `cox2_celecoxib`), while failing on `cox1_ibuprofen` (`6.12 Å`). Note that with $N = 2$ reference complexes, these results serve as an illustrative case study rather than a statistical benchmark.
-2. **Scoring vs. Sampling in Classical Docking:**
+2. **Vina Best-of-9 RMSD (Sampling vs. Scoring):**
    * For `cox1_ibuprofen`, Vina's **best-of-9** pose reached **0.61 Å** RMSD to the crystal ligand, whereas its **top-1** ranked pose was **6.12 Å** (a flipped orientation inside the pocket). This demonstrates a classic docking bottleneck: Vina's search algorithm *sampled* the native pose accurately, but its empirical scoring function *ranked* an inverted pose higher (`-7.50 kcal/mol`).
 3. **Cross-Method Agreement & Aspirin Binding:**
    * Wherever Vina top-1 and Boltz agreed within `< 1.5 Å` (`cox2_celecoxib` at `0.84 Å`), both closely matched the crystal structure.
@@ -122,10 +129,10 @@ Predictions are apo (no ligand or heme) and compared against single crystal snap
 
 ## Limitations & Caveats
 
-* **Asymmetric Information:** AutoDock Vina was given the exact crystal protein conformation and a `24 Å` box centered on the native ligand, whereas Boltz predicted the entire complex from sequence and SMILES alone. Whole-protein blind docking would provide a stricter comparison.
-* **Potential Training Set Overlap:** PDB entries `1EQG` and `3LN1` predate Boltz's training cutoff, meaning Boltz's sub-Ångström accuracy on these complexes may partly reflect training data familiarity rather than pure out-of-distribution generalization.
-* **Sample Size & Determinism:** Results are based on two reference complexes, two aspirin systems, a single random seed, and a single run per method.
-* **Physical & Chemical Simplifications:** Docking treated the receptor as rigid without crystallographic waters or the heme cofactor, and non-covalent modeling does not explicitly simulate aspirin's covalent transacetylation reaction.
+* **Asymmetric Setup:** Vina received the crystal structure and a 24 Å pocket box, whereas Boltz predicted the complex from sequence and SMILES alone.
+* **Training Overlap:** `1EQG` and `3LN1` predate Boltz's training cutoff, so accuracy on them may partly reflect training familiarity.
+* **Small Sample:** Results cover two reference ligands, two aspirin systems, one random seed, and one run per method.
+* **Modeling Simplifications:** Docking used a rigid receptor without crystallographic waters or heme, and omitted aspirin's covalent acetylation of `SER530`.
 
 
 ## Tools
